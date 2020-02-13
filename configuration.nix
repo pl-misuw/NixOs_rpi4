@@ -153,7 +153,7 @@ in
 
   i18n.defaultLocale = "en_US.UTF-8";
 
-  networking.hostName = "NixBerry";
+  networking.hostName = "nixberry";
   networking.wireless.enable = false;
   networking.interfaces.eth0.useDHCP = true;
   networking.firewall.enable = false;
@@ -187,8 +187,9 @@ in
   users.users.plmisuw = {
     isNormalUser = true;
     home = "/home/plmisuw";
-    description = "UMD plmisuw group user";
-    extraGroups = [ "wheel" "gpio" ];
+    group = "users";
+    description = "plmisuw group user";
+    extraGroups = [ "wheel" "gpio" "networkmanager"];
     shell = pkgs.zsh;
     hashedPassword = "$5$95d04woG0fZuzx$xAi.yYeEcM1qRomxXRIEv/44o.PwfrF9xu8BDjjNMx4";
     openssh.authorizedKeys.keys = [
