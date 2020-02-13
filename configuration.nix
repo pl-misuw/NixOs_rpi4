@@ -1,11 +1,7 @@
 { config, pkgs, lib, ... }:
 
 let
-  # Use latest main line kernel
-  #kernel = pkgs.linuxPackages_latest;
-  # Use latest lts kernel
-  #kernel = pkgs.linuxPackages;
-  # Use Linux kernel for rpi4
+  # Kernel for rpi4
   kernel = pkgs.linuxPackages_rpi4;
 in
 
@@ -16,43 +12,32 @@ in
 
   nix.nixPath = [
     "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos/nixpkgs"
-    #"nixpkgs-overlays=/etc/nixos/overlays"
     "nixos-config=/etc/nixos/configuration.nix"
     "/nix/var/nix/profiles/per-user/root/channels"
   ];
 
   imports = [
-    # Program config
     ./programs/zsh
-    ./programs/tmux
   ];
 
   environment.systemPackages = with pkgs; [
-    # GNU userland
-    #coreutils
-    #gnumake
-    #gnugrep
-    #gnused
-
-    # System config
     mkpasswd
-
+    zsh
     # Dev tools
     git
+    nix-prefetch-scripts
+    VI
+
+    #Cluster tools
     podman
     skopeo
     docker
     k3d
     k3s
-    #ripgrep
-    #cmake
-    #ctags
-    nix-prefetch-scripts
 
     # Utilities
     tree
     findutils
-    pstree
     htop
   ];
 
@@ -63,10 +48,7 @@ in
     export EDITOR=vi
     alias df='df -hT'
     alias du='du -hs'
-    alias nix-shell='nix-shell --run zsh'
-    alias nix-reg='nix-instantiate shell.nix --indirect --add-root $HOME/.gcroots/$(basename $(pwd))'
-    alias nix-sys-installed='nix-store --query --requisites /run/current-system | cut -d- -f2- | sort | uniq'
-    alias nix-sys-generations='sudo nix-env --list-generations --profile /nix/var/nix/profiles/system'
+    alias ll='ls -lah'
   '';
 
   # Don't install NixOS manual
@@ -81,14 +63,11 @@ in
 
   # NixOS wants to enable GRUB by default
   boot.loader.grub.enable = false;
-  # Enables the generation of /boot/extlinux/extlinux.conf
-  #boot.loader.generic-extlinux-compatible.enable = true;
 
   # rpi foundation's bootloader settings
   boot.loader.raspberryPi = {
     enable = true;
     version = 4;
-    #uboot.enable = true;
 
     firmwareConfig = ''
       dtoverlay=w1-gpio-pullup
