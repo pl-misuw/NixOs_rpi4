@@ -20,20 +20,32 @@ in
     ./programs/zsh
   ];
 
+  # Enable cron service
+  services.cron = {
+    enable = true;
+    systemCronJobs = [
+      "*/5 * * * *      root    date >> /tmp/cron.log"
+      "@hourly  root  speedtest-cli >> /home/plmisuw/share/netspeed.csv"
+    ];
+  };
+
   environment.systemPackages = with pkgs; [
+    #Sys tools
     mkpasswd
     zsh
+    fzf
+    wget
+    speedtest-cli
+
     # Dev tools
     git
     nix-prefetch-scripts
-    VI
+    vim
 
     #Cluster tools
     podman
     skopeo
     docker
-    k3d
-    k3s
 
     # Utilities
     tree
