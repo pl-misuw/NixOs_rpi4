@@ -22,12 +22,9 @@ in
   ];
 
   imports = [
-    # Extra modules
-    #./modules
-
     # Program config
-    #./programs/zsh
-    #./programs/tmux
+    ./programs/zsh
+    ./programs/tmux
   ];
 
   environment.systemPackages = with pkgs; [
@@ -42,12 +39,15 @@ in
 
     # Dev tools
     git
-    #tig
-    #fzf
+    podman
+    skopeo
+    docker
+    k3d
+    k3s
     #ripgrep
     #cmake
     #ctags
-    #nix-prefetch-scripts
+    nix-prefetch-scripts
 
     # Utilities
     tree
