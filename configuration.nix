@@ -15,10 +15,10 @@ in
   #####################
 
   nix.nixPath = [
-    #"nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos/nixpkgs"
+    "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos/nixpkgs"
     #"nixpkgs-overlays=/etc/nixos/overlays"
     "nixos-config=/etc/nixos/configuration.nix"
-    #"/nix/var/nix/profiles/per-user/root/channels"
+    "/nix/var/nix/profiles/per-user/root/channels"
   ];
 
   imports = [
@@ -141,11 +141,6 @@ in
   # Hardware settings
   hardware.bluetooth.enable = false;
   hardware.enableRedistributableFirmware = true;
-  hardware.deviceTree = {
-    overlays = [{
-      overlay = "${kernel.kernel}/dtbs/overlays/w1-gpio-pullup.dtbo";
-    }];
-  };
 
   ########################
   # Host-specific config #
