@@ -25,7 +25,7 @@ in
     enable = true;
     systemCronJobs = [
       "*/5 * * * *      root    date >> /tmp/cron.log"
-      "@hourly  root  speedtest-cli >> /home/plmisuw/share/netspeed.csv"
+      "@hourly  root  speedtest-cli --csv --csv-delimiter '|' >> /home/plmisuw/share/netspeed.csv"
     ];
   };
 
@@ -46,11 +46,13 @@ in
     podman
     skopeo
     docker
+    docker-compose
 
     # Utilities
     tree
     findutils
     htop
+    dnsutils
   ];
 
   # Make instantiate persistent nix-shell possible.
@@ -142,7 +144,10 @@ in
   networking.hostName = "nixberry";
   networking.wireless.enable = false;
   networking.interfaces.eth0.useDHCP = true;
-  networking.firewall.enable = false;
+  networking.firewall.enable = true;
+  networking.firewall.allowedTCPPorts = [ 22 80 443 8080 8081 8443 8843 8880 6789];
+  networking.firewall.allowedUDPPorts = [ 3478 10001 ];
+  networking.firewall.allowPing = true;
 
   time.timeZone = "Europe/Warsaw";
 
@@ -153,6 +158,11 @@ in
   # sudo configuration
   security.sudo.wheelNeedsPassword = false;
 
+  ####################
+  #  Virtualisation  #
+  ####################
+
+  virtualisation.docker.enable = true;
 
   ###################
   # User management #
@@ -175,7 +185,7 @@ in
     home = "/home/plmisuw";
     group = "users";
     description = "plmisuw group user";
-    extraGroups = [ "wheel" "gpio" "networkmanager"];
+    extraGroups = [ "wheel" "gpio" "networkmanager" "Docker" ];
     shell = pkgs.zsh;
     hashedPassword = "$5$95d04woG0fZuzx$xAi.yYeEcM1qRomxXRIEv/44o.PwfrF9xu8BDjjNMx4";
     openssh.authorizedKeys.keys = [
