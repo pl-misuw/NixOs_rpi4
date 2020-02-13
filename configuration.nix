@@ -15,39 +15,39 @@ in
   #####################
 
   nix.nixPath = [
-    "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos/nixpkgs"
-    "nixpkgs-overlays=/etc/nixos/overlays"
+    #"nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos/nixpkgs"
+    #"nixpkgs-overlays=/etc/nixos/overlays"
     "nixos-config=/etc/nixos/configuration.nix"
-    "/nix/var/nix/profiles/per-user/root/channels"
+    #"/nix/var/nix/profiles/per-user/root/channels"
   ];
 
   imports = [
     # Extra modules
-    ./modules
+    #./modules
 
     # Program config
-    ./programs/zsh
-    ./programs/tmux
+    #./programs/zsh
+    #./programs/tmux
   ];
 
   environment.systemPackages = with pkgs; [
     # GNU userland
-    coreutils
-    gnumake
-    gnugrep
-    gnused
+    #coreutils
+    #gnumake
+    #gnugrep
+    #gnused
 
     # System config
     mkpasswd
 
     # Dev tools
     git
-    tig
-    fzf
-    ripgrep
-    cmake
-    ctags
-    nix-prefetch-scripts
+    #tig
+    #fzf
+    #ripgrep
+    #cmake
+    #ctags
+    #nix-prefetch-scripts
 
     # Utilities
     tree
