@@ -4,7 +4,7 @@
   programs.tmux = {
     enable = true;
 
-    extraTmuxConf = ''
+    extraConfig = ''
       # Status bar
       set -g status-justify centre
       set -g status-bg black
