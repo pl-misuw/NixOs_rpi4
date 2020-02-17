@@ -17,7 +17,7 @@ in
   ];
 
   imports = [
-    ./programs/zsh
+    ./programs/zsh 
   ];
 
   # Enable cron service
@@ -29,6 +29,14 @@ in
     ];
   };
 
+  # Enable k8s service
+  services.kubernetes = {
+    roles = [ "master" "node" ];
+    masterAddress = "k8s.suvarhalla";
+  };
+
+  
+  nixpkgs.config.allowUnsupportedSystem = true;  
   environment.systemPackages = with pkgs; [
     #Sys tools
     mkpasswd
@@ -47,7 +55,7 @@ in
     skopeo
     docker
     docker-compose
-
+  
     # Utilities
     tree
     findutils
