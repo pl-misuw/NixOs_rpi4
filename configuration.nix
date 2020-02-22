@@ -33,10 +33,12 @@ in
   services.kubernetes = {
     roles = [ "master" "node" ];
     masterAddress = "k8s.suvarhalla";
+    easyCerts = true;
   };
-
-  
-  nixpkgs.config.allowUnsupportedSystem = true;  
+  systemd.services.etcd.environment.ETCD_UNSUPPORTED_ARCH = "arm64";  
+  services.kubernetes.kubelet.extraOpts = "--fail-swap-on=false";
+    
+  #nixpkgs.config.allowUnsupportedSystem = true;  
   environment.systemPackages = with pkgs; [
     #Sys tools
     mkpasswd
@@ -55,12 +57,14 @@ in
     skopeo
     docker
     docker-compose
-  
+    kubectl  
+
     # Utilities
     tree
     findutils
     htop
     dnsutils
+    openssl
   ];
 
   # Make instantiate persistent nix-shell possible.
@@ -149,7 +153,7 @@ in
 
   i18n.defaultLocale = "en_US.UTF-8";
 
-  networking.hostName = "nixberry";
+  networking.hostName = "k8s";
   networking.wireless.enable = false;
   networking.interfaces.eth0.useDHCP = true;
   networking.firewall.enable = true;
@@ -193,7 +197,7 @@ in
     home = "/home/plmisuw";
     group = "users";
     description = "plmisuw group user";
-    extraGroups = [ "wheel" "gpio" "networkmanager" "Docker" ];
+    extraGroups = [ "wheel" "gpio" "networkmanager" "docker" ];
     shell = pkgs.zsh;
     hashedPassword = "$5$95d04woG0fZuzx$xAi.yYeEcM1qRomxXRIEv/44o.PwfrF9xu8BDjjNMx4";
     openssh.authorizedKeys.keys = [
