@@ -25,7 +25,7 @@ in
     enable = true;
     systemCronJobs = [
       "*/5 * * * *      root    date >> /tmp/cron.log"
-      "@hourly  root  speedtest-cli --csv --csv-delimiter '|' >> /home/plmisuw/share/netspeed.csv"
+      "@hourly  root  speedtest-cli --csv --csv-delimiter ',' >> /home/plmisuw/share/netspeed.csv"
     ];
   };
 
@@ -34,9 +34,12 @@ in
     roles = [ "master" "node" ];
     masterAddress = "k8s.suvarhalla";
     easyCerts = true;
+    kubelet.extraOpts = "--fail-swap-on=false";
+    addons.dashboard.enable = true;
   };
   systemd.services.etcd.environment.ETCD_UNSUPPORTED_ARCH = "arm64";  
-  services.kubernetes.kubelet.extraOpts = "--fail-swap-on=false";
+  #services.kubernetes.kubelet.extraOpts = "--fail-swap-on=false";
+  #systemd.services.flannel.environment = "10.0.0.0/8";
     
   #nixpkgs.config.allowUnsupportedSystem = true;  
   environment.systemPackages = with pkgs; [
@@ -53,7 +56,7 @@ in
     vim
 
     #Cluster tools
-    podman
+    #podman
     skopeo
     docker
     docker-compose
@@ -153,7 +156,7 @@ in
 
   i18n.defaultLocale = "en_US.UTF-8";
 
-  networking.hostName = "k8s";
+  networking.hostName = "k8s.suvarhalla";
   networking.wireless.enable = false;
   networking.interfaces.eth0.useDHCP = true;
   networking.firewall.enable = true;
