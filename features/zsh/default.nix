@@ -4,7 +4,7 @@
   programs.zsh = {
     enable = true;
     enableCompletion = true;
-    enableFzfHistory = true;
+    #enableFzfHistory = true;
     #enableFzfCompletion = true;
 
     #autosuggestions.enable = true;

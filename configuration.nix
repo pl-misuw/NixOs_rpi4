@@ -1,11 +1,7 @@
 { config, pkgs, lib, ... }:
 
 let
-  # Use latest main line kernel
-  #kernel = pkgs.linuxPackages_latest;
-  # Use latest lts kernel
-  #kernel = pkgs.linuxPackages;
-  # Use Linux kernel for rpi4
+  # Kernel for rpi4
   kernel = pkgs.linuxPackages_rpi4;
 in
 
@@ -16,64 +12,17 @@ in
 
   nix.nixPath = [
     "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos/nixpkgs"
-    #"nixpkgs-overlays=/etc/nixos/overlays"
     "nixos-config=/etc/nixos/configuration.nix"
     "/nix/var/nix/profiles/per-user/root/channels"
   ];
 
   imports = [
-    # Program config
-    ./programs/zsh
-    ./programs/tmux
+    ./features/k8s 
+    ./features/unify 
+    ./features/zsh 
+    ./hardware/rpi4_master
+    ./profiles/pl-misuw
   ];
-
-  environment.systemPackages = with pkgs; [
-    # GNU userland
-    #coreutils
-    #gnumake
-    #gnugrep
-    #gnused
-
-    # System config
-    mkpasswd
-
-    # Dev tools
-    git
-    podman
-    skopeo
-    docker
-    k3d
-    k3s
-    #ripgrep
-    #cmake
-    #ctags
-    nix-prefetch-scripts
-
-    # Utilities
-    tree
-    findutils
-    pstree
-    htop
-  ];
-
-  # Make instantiate persistent nix-shell possible.
-  nix.extraOptions = "keep-outputs = true";
-
-  environment.interactiveShellInit = ''
-    export EDITOR=vi
-    alias df='df -hT'
-    alias du='du -hs'
-    alias nix-shell='nix-shell --run zsh'
-    alias nix-reg='nix-instantiate shell.nix --indirect --add-root $HOME/.gcroots/$(basename $(pwd))'
-    alias nix-sys-installed='nix-store --query --requisites /run/current-system | cut -d- -f2- | sort | uniq'
-    alias nix-sys-generations='sudo nix-env --list-generations --profile /nix/var/nix/profiles/system'
-  '';
-
-  # Don't install NixOS manual
-  #documentation.nixos.enable = false;
-
-  system.stateVersion = "20.03";
-
 
   #################################
   # NixOS config for Raspberry Pi #
@@ -81,14 +30,11 @@ in
 
   # NixOS wants to enable GRUB by default
   boot.loader.grub.enable = false;
-  # Enables the generation of /boot/extlinux/extlinux.conf
-  #boot.loader.generic-extlinux-compatible.enable = true;
 
   # rpi foundation's bootloader settings
   boot.loader.raspberryPi = {
     enable = true;
     version = 4;
-    #uboot.enable = true;
 
     firmwareConfig = ''
       dtoverlay=w1-gpio-pullup
@@ -141,54 +87,4 @@ in
   # Hardware settings
   hardware.bluetooth.enable = false;
   hardware.enableRedistributableFirmware = true;
-
-  ########################
-  # Host-specific config #
-  ########################
-
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  networking.hostName = "nixberry";
-  networking.wireless.enable = false;
-  networking.interfaces.eth0.useDHCP = true;
-  networking.firewall.enable = false;
-
-  time.timeZone = "Europe/Warsaw";
-
-  # SSH configuration
-  services.openssh.enable = true;
-  services.openssh.permitRootLogin = "no";
-
-  # sudo configuration
-  security.sudo.wheelNeedsPassword = false;
-
-
-  ###################
-  # User management #
-  ###################
-
-  # Fully control all user settings declaratively
-  # i.e. "passwd" command will be non-effective
-  users.mutableUsers = false;
-
-  # Extra groups
-  users.groups.gpio = {};
-
-  users.users.root = {
-    shell = pkgs.zsh;
-    hashedPassword = "$5$95d04woG0fZuzx$xAi.yYeEcM1qRomxXRIEv/44o.PwfrF9xu8BDjjNMx4";
-  };
-
-  users.users.plmisuw = {
-    isNormalUser = true;
-    home = "/home/plmisuw";
-    group = "users";
-    description = "plmisuw group user";
-    extraGroups = [ "wheel" "gpio" "networkmanager"];
-    shell = pkgs.zsh;
-    hashedPassword = "$5$95d04woG0fZuzx$xAi.yYeEcM1qRomxXRIEv/44o.PwfrF9xu8BDjjNMx4";
-    openssh.authorizedKeys.keys = [
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCmWtgHVDhLNJxTwmzU2YMY0kiYJCTxZBMLVs2qtIg728wiOkH4RO6+SGEx7eMhW5w1TzXauokjdnGApT5EnHUto284Pa/o5MRuWkn0hzAwLv9SLZ7fu1DpEY9NjAHVgGSh+eR0Wz6sKCVs+0NJd0gLp2han5yZ62H6L0dYk7iJxJwZYBwfhfaCHCz77f7hOsWwhlLx3Ob8On/xFxtq4zjb+vUMwdfEjR2Aks3QjoEC/F1PrkirSwNgPdoh2ZRamBNFE81RpbOrmECB0q+N/s4qbdiV0LDDm7yJNtp6O4VmPFKzo9M9bWKQ9VrE4ugIpd28qUO/RxLmsxKZCYdiSuod admin@THE_MACHINE"
-    ];
-  };
 }
