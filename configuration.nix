@@ -17,74 +17,12 @@ in
   ];
 
   imports = [
-    ./programs/zsh 
+    ./features/k8s 
+    ./features/unify 
+    ./features/zsh 
+    ./hardware/rpi4_master
+    ./profiles/pl-misuw
   ];
-
-  # Enable cron service
-  services.cron = {
-    enable = true;
-    systemCronJobs = [
-      "*/5 * * * *      root    date >> /tmp/cron.log"
-      "@hourly  root  speedtest-cli --csv --csv-delimiter ',' >> /home/plmisuw/share/netspeed.csv"
-    ];
-  };
-
-  # Enable k8s service
-  services.kubernetes = {
-    roles = [ "master" "node" ];
-    masterAddress = "k8s.suvarhalla";
-    easyCerts = true;
-    kubelet.extraOpts = "--fail-swap-on=false";
-    addons.dashboard.enable = true;
-  };
-  systemd.services.etcd.environment.ETCD_UNSUPPORTED_ARCH = "arm64";  
-  #services.kubernetes.kubelet.extraOpts = "--fail-swap-on=false";
-  #systemd.services.flannel.environment = "10.0.0.0/8";
-    
-  #nixpkgs.config.allowUnsupportedSystem = true;  
-  environment.systemPackages = with pkgs; [
-    #Sys tools
-    mkpasswd
-    zsh
-    fzf
-    wget
-    speedtest-cli
-
-    # Dev tools
-    git
-    nix-prefetch-scripts
-    vim
-
-    #Cluster tools
-    #podman
-    skopeo
-    docker
-    docker-compose
-    kubectl  
-
-    # Utilities
-    tree
-    findutils
-    htop
-    dnsutils
-    openssl
-  ];
-
-  # Make instantiate persistent nix-shell possible.
-  nix.extraOptions = "keep-outputs = true";
-
-  environment.interactiveShellInit = ''
-    export EDITOR=vi
-    alias df='df -hT'
-    alias du='du -hs'
-    alias ll='ls -lah'
-  '';
-
-  # Don't install NixOS manual
-  #documentation.nixos.enable = false;
-
-  system.stateVersion = "20.03";
-
 
   #################################
   # NixOS config for Raspberry Pi #
@@ -149,62 +87,4 @@ in
   # Hardware settings
   hardware.bluetooth.enable = false;
   hardware.enableRedistributableFirmware = true;
-
-  ########################
-  # Host-specific config #
-  ########################
-
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  networking.hostName = "k8s.suvarhalla";
-  networking.wireless.enable = false;
-  networking.interfaces.eth0.useDHCP = true;
-  networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [ 22 80 443 8080 8081 8443 8843 8880 6789];
-  networking.firewall.allowedUDPPorts = [ 3478 10001 ];
-  networking.firewall.allowPing = true;
-
-  time.timeZone = "Europe/Warsaw";
-
-  # SSH configuration
-  services.openssh.enable = true;
-  services.openssh.permitRootLogin = "no";
-
-  # sudo configuration
-  security.sudo.wheelNeedsPassword = false;
-
-  ####################
-  #  Virtualisation  #
-  ####################
-
-  virtualisation.docker.enable = true;
-
-  ###################
-  # User management #
-  ###################
-
-  # Fully control all user settings declaratively
-  # i.e. "passwd" command will be non-effective
-  users.mutableUsers = false;
-
-  # Extra groups
-  users.groups.gpio = {};
-
-  users.users.root = {
-    shell = pkgs.zsh;
-    hashedPassword = "$5$95d04woG0fZuzx$xAi.yYeEcM1qRomxXRIEv/44o.PwfrF9xu8BDjjNMx4";
-  };
-
-  users.users.plmisuw = {
-    isNormalUser = true;
-    home = "/home/plmisuw";
-    group = "users";
-    description = "plmisuw group user";
-    extraGroups = [ "wheel" "gpio" "networkmanager" "docker" ];
-    shell = pkgs.zsh;
-    hashedPassword = "$5$95d04woG0fZuzx$xAi.yYeEcM1qRomxXRIEv/44o.PwfrF9xu8BDjjNMx4";
-    openssh.authorizedKeys.keys = [
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCmWtgHVDhLNJxTwmzU2YMY0kiYJCTxZBMLVs2qtIg728wiOkH4RO6+SGEx7eMhW5w1TzXauokjdnGApT5EnHUto284Pa/o5MRuWkn0hzAwLv9SLZ7fu1DpEY9NjAHVgGSh+eR0Wz6sKCVs+0NJd0gLp2han5yZ62H6L0dYk7iJxJwZYBwfhfaCHCz77f7hOsWwhlLx3Ob8On/xFxtq4zjb+vUMwdfEjR2Aks3QjoEC/F1PrkirSwNgPdoh2ZRamBNFE81RpbOrmECB0q+N/s4qbdiV0LDDm7yJNtp6O4VmPFKzo9M9bWKQ9VrE4ugIpd28qUO/RxLmsxKZCYdiSuod admin@THE_MACHINE"
-    ];
-  };
 }
