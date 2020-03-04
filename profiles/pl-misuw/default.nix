@@ -40,6 +40,8 @@
     htop
     dnsutils
     openssl
+    wireguard
+    gping
   ];
 
   # Make instantiate persistent nix-shell possible.
