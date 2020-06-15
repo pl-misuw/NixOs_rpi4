@@ -6,14 +6,21 @@
   ########################
 
   i18n.defaultLocale = "en_US.UTF-8";
-
+  networking.nat.enable = true;
+  networking.nat.externalInterface = "eth0";
+  networking.nat.internalInterfaces = [ "wg0" ];
   networking.hostName = "k8s.suvarhalla";
   networking.wireless.enable = false;
   networking.interfaces.eth0.useDHCP = true;
-  networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [ 22 80 443 8080 8081 8443 8843 8880 6789];
-  networking.firewall.allowedUDPPorts = [ 3478 10001 ];
-  networking.firewall.allowPing = true;
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 22 80 443 8080 8081 8443 8843 8880 6789];
+    allowedUDPPorts = [ 3478 10001 51820 ];
+    allowPing = true;
+    extraCommands = ''
+    iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -o eth0 -j MASQUERADE
+    '';
+  }
 
   time.timeZone = "Europe/Warsaw";
 
